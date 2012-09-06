@@ -23,4 +23,4 @@ use
 test
 ----
 
-    go test github.com/rudenoise/counting
+    go test github.com/rudenoise/counting/count
