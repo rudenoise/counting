@@ -19,3 +19,8 @@ use
     	"github.com/rudenoise/counting/count"
     	"github.com/rudenoise/counting/dir"
     )
+
+test
+----
+
+    go test github.com/rudenoise/counting
