@@ -38,4 +38,8 @@ func TestTokensToSlice(t *testing.T) {
 	if ts[0].Token != "hello" {
 		t.Errorf("Expected token %s at position 0 got token %s", "hello", ts[0].Token)
 	}
+	sort.Sort(TokenSliceByCountAsc{ts})
+	if ts[0].Token != "world" {
+		t.Errorf("Expected token %s at position 0 got token %s", "world", ts[0].Token)
+	}
 }

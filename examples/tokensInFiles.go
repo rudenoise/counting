@@ -10,6 +10,7 @@ import (
 	"sort"
 )
 
+var asc = flag.Bool("asc", false, "order ascending/descending")
 var exclude = flag.String("exclude", "^$", "regexp pattern to exclude in file path")
 var include = flag.String("include", "", "regexp pattern to include file path")
 var lmt = flag.Int("limit", 0, "limit number of results")
@@ -33,7 +34,11 @@ func main() {
 		count.TokensInFiles(filePaths, *tokenRegExp, tMap)
 
 		tSlice := tMap.ToSlice()
-		sort.Sort(count.TokenSliceByCountDesc{tSlice})
+		if (*asc == true) {
+			sort.Sort(count.TokenSliceByCountAsc{tSlice})
+		} else {
+			sort.Sort(count.TokenSliceByCountDesc{tSlice})
+		}
 		length = len(tSlice)
 		if *lmt != 0 && *lmt <= length {
 			length = *lmt
