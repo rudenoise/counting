@@ -2,6 +2,7 @@ package count
 
 import (
 	"testing"
+	"sort"
 )
 
 func TestTokensInFile(t *testing.T) {
@@ -25,5 +26,16 @@ func TestTokensInFiles(t *testing.T) {
 	if tm["hello"] != expectedHello && tm["world"] != expectedWorld {
 		t.Errorf("Expected %d occurances of 'hello', got %d", expectedHello, tm["hello"])
 		t.Errorf("Expected %d occurances of 'world', got %d", expectedWorld, tm["world"])
+	}
+}
+
+func TestTokensToSlice(t *testing.T) {
+	testFilePaths := []string{"testTokens1.txt", "testTokens2.txt"}
+	tm := make(TokensMap)
+	TokensInFiles(testFilePaths, "[a-zA-z]+", tm)
+	ts := tm.ToSlice()
+	sort.Sort(TokenSliceByCountDesc{ ts })
+	if ts[0].Token != "hello" {
+		t.Errorf("Expected token %s at position 0 got token %s", "hello", ts[0].Token)
 	}
 }
