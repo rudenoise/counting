@@ -34,11 +34,14 @@ func TokensInFile(path string, tokenRE string, tokensMap TokensMap) {
 func TokensInFiles(filePaths []string, tokenRE string, tokensMap TokensMap) {
 	var wg sync.WaitGroup
 	for i := 0; i < len(filePaths); i++ {
+		TokensInFile(filePaths[i], tokenRE, tokensMap)
+		/*
 		wg.Add(1)
 		go func(fp string) {
 			TokensInFile(fp, tokenRE, tokensMap)
 			wg.Done()
 		}(filePaths[i])
+		*/
 	}
 	wg.Wait()
 }
