@@ -34,10 +34,11 @@ func main() {
 
 		tSlice := tMap.ToSlice()
 		sort.Sort(count.TokenSliceByCountDesc{tSlice})
+		length = len(tSlice)
 		if *lmt != 0 && *lmt <= length {
 			length = *lmt
 		}
-		for i := 0; i < len(tSlice); i++ {
+		for i := 0; i < length; i++ {
 			fmt.Printf("%7d\t%s\n", tSlice[i].Count, tSlice[i].Token)
 		}
 
