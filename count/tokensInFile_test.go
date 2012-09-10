@@ -1,8 +1,8 @@
 package count
 
 import (
-	"testing"
 	"sort"
+	"testing"
 )
 
 func TestTokensInFile(t *testing.T) {
@@ -34,7 +34,7 @@ func TestTokensToSlice(t *testing.T) {
 	tm := make(TokensMap)
 	TokensInFiles(testFilePaths, "[a-zA-z]+", tm)
 	ts := tm.ToSlice()
-	sort.Sort(TokenSliceByCountDesc{ ts })
+	sort.Sort(TokenSliceByCountDesc{ts})
 	if ts[0].Token != "hello" {
 		t.Errorf("Expected token %s at position 0 got token %s", "hello", ts[0].Token)
 	}
