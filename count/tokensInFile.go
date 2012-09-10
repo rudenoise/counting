@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"regexp"
+	"sync"
 )
 
 func TokensInFile(path string, tokenRE string, tokensMap TokensMap) {
@@ -28,4 +29,16 @@ func TokensInFile(path string, tokenRE string, tokensMap TokensMap) {
 			break
 		}
 	}
+}
+
+func TokensInFiles(filePaths []string, tokenRE string, tokensMap TokensMap) {
+	var wg sync.WaitGroup
+	for i := 0; i < len(filePaths); i++ {
+		wg.Add(1)
+		go func(fp string) {
+			TokensInFile(fp, tokenRE, tokensMap)
+			wg.Done()
+		}(filePaths[i])
+	}
+	wg.Wait()
 }
