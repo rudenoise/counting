@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"github.com/rudenoise/counting/count"
 	"github.com/rudenoise/counting/dir"
-	"path/filepath"
-	//"runtime"
 	"os"
+	"path/filepath"
 	"sort"
 )
 
@@ -42,6 +41,7 @@ func (p ByLinesReverse) Less(i, j int) bool { return p.Files[i].Lines > p.Files[
 var byBytes = flag.Bool("bytes", false, "order by byte length or line length")
 var asc = flag.Bool("asc", false, "order ascending/descending")
 var colour = flag.Bool("c", false, "colour output")
+var ignoreCommentsEmptyLines = flag.Bool("icel", false, "colour output")
 var lmt = flag.Int("limit", 0, "limit number of results")
 var exclude = flag.String("exclude", "^$", "regexp pattern to exclude in file path")
 var include = flag.String("include", "", "regexp pattern to include file path")
@@ -57,7 +57,7 @@ func out(p Files, limit int) {
 	}
 }
 
-func fullInfo(fps []string) Files {
+func fullInfo(fps []string, elc bool) Files {
 	var files Files
 	for i := 1; i < len(fps); i++ {
 		f, err := os.Open(fps[i])
@@ -68,7 +68,7 @@ func fullInfo(fps []string) Files {
 		if err != nil {
 			panic(err)
 		}
-		lines, err := count.LinesInFile(fps[i])
+		lines, err := count.LinesInFile(fps[i], elc)
 		if err != nil {
 			panic(err)
 		}
@@ -85,7 +85,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	filePaths := fullInfo(fps)
+	filePaths := fullInfo(fps, *ignoreCommentsEmptyLines)
 	// order by args
 	if *byBytes {
 		if *asc {

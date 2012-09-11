@@ -4,9 +4,19 @@ import (
 	"testing"
 )
 
-func TestLinesInFile(t *testing.T) {
-	const expectedTotal = 3
-	actualTotal, err := LinesInFile("tstFile.txt")
+func TestLinesInFileWithoutCommentsAndEmptyLines(t *testing.T) {
+	expectedTotal := 3
+	actualTotal, err := LinesInFile("tstFile.txt", true)
+	if err != nil {
+		t.Error(err)
+	}
+	if expectedTotal != actualTotal {
+		t.Errorf("Expected: %d, actual: %d", expectedTotal, actualTotal)
+	}
+}
+func TestLinesInFileWithCommentsAndEmptyLines(t *testing.T) {
+	expectedTotal := 9
+	actualTotal, err := LinesInFile("tstFile.txt", false)
 	if err != nil {
 		t.Error(err)
 	}

@@ -14,6 +14,7 @@ import (
 var exclude = flag.String("exclude", "^$", "regexp pattern to exclude in file path")
 var include = flag.String("include", "", "regexp pattern to include file path")
 var lmt = flag.Int("limit", 0, "limit number of results")
+var ignoreCommentsEmptyLines = flag.Bool("icel", false, "colour output")
 
 type File struct {
 	FilePath  string
@@ -38,7 +39,7 @@ func OpenParallel(paths []string) Files {
 	for i := 0; i < len(paths); i++ {
 		wg.Add(1)
 		go func(fp string) {
-			lines, err := count.LinesInFile(fp)
+			lines, err := count.LinesInFile(fp, *ignoreCommentsEmptyLines)
 			if err != nil {
 				panic(err)
 			}

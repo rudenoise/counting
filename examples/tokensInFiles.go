@@ -34,7 +34,7 @@ func main() {
 		count.TokensInFiles(filePaths, *tokenRegExp, tMap)
 
 		tSlice := tMap.ToSlice()
-		if (*asc == true) {
+		if *asc == true {
 			sort.Sort(count.TokenSliceByCountAsc{tSlice})
 		} else {
 			sort.Sort(count.TokenSliceByCountDesc{tSlice})

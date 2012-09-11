@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"io"
 	"os"
+	"regexp"
 )
 
-func LinesInFile(filePath string) (int, error) {
+func LinesInFile(filePath string, ignoreCommentsAndEmptyLines bool) (int, error) {
 	total := 0
 	contents, err := os.Open(filePath)
 	defer contents.Close()
@@ -22,7 +23,15 @@ func LinesInFile(filePath string) (int, error) {
 		if err != nil {
 			return total, err
 		}
-		if read != "" {
+		if ignoreCommentsAndEmptyLines == true {
+			ignoreLineMatch, err := regexp.MatchString("^\n$|^[\\ \t]+(\\/\\/)?.*|^\\/\\/.*", read)
+			if err != nil {
+				return total, err
+			}
+			if ignoreLineMatch == false {
+				total++
+			}
+		} else {
 			total++
 		}
 	}

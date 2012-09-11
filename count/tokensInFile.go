@@ -36,11 +36,11 @@ func TokensInFiles(filePaths []string, tokenRE string, tokensMap TokensMap) {
 	for i := 0; i < len(filePaths); i++ {
 		TokensInFile(filePaths[i], tokenRE, tokensMap)
 		/*
-		wg.Add(1)
-		go func(fp string) {
-			TokensInFile(fp, tokenRE, tokensMap)
-			wg.Done()
-		}(filePaths[i])
+			wg.Add(1)
+			go func(fp string) {
+				TokensInFile(fp, tokenRE, tokensMap)
+				wg.Done()
+			}(filePaths[i])
 		*/
 	}
 	wg.Wait()
