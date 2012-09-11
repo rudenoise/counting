@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 	"regexp"
-	"sync"
+	//"sync"
 )
 
 func TokensInFile(path string, tokenRE string, tokensMap TokensMap) {
@@ -32,7 +32,7 @@ func TokensInFile(path string, tokenRE string, tokensMap TokensMap) {
 }
 
 func TokensInFiles(filePaths []string, tokenRE string, tokensMap TokensMap) {
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
 	for i := 0; i < len(filePaths); i++ {
 		TokensInFile(filePaths[i], tokenRE, tokensMap)
 		/*
@@ -43,5 +43,5 @@ func TokensInFiles(filePaths []string, tokenRE string, tokensMap TokensMap) {
 			}(filePaths[i])
 		*/
 	}
-	wg.Wait()
+	//wg.Wait()
 }
