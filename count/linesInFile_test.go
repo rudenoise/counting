@@ -5,7 +5,7 @@ import (
 )
 
 func TestLinesInFileWithoutCommentsAndEmptyLines(t *testing.T) {
-	expectedTotal := 3
+	expectedTotal := 4
 	actualTotal, err := LinesInFile("tstFile.txt", true)
 	if err != nil {
 		t.Error(err)

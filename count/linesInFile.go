@@ -24,7 +24,7 @@ func LinesInFile(filePath string, ignoreCommentsAndEmptyLines bool) (int, error)
 			return total, err
 		}
 		if ignoreCommentsAndEmptyLines == true {
-			ignoreLineMatch, err := regexp.MatchString("^\n$|^[\\ \t]+(\\/\\/)?.*|^\\/\\/.*", read)
+			ignoreLineMatch, err := regexp.MatchString("^\n$|^[\\ \t]+\n$|^[\\ \t]+\\/\\/.*\n$|^\\/\\/.*\n$", read)
 			if err != nil {
 				return total, err
 			}
