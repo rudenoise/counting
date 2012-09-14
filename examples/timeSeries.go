@@ -57,6 +57,6 @@ func countAll(paths []string, position int) {
 			countMap[paths[i]] = make([]int, *steps)
 			file = countMap[paths[i]]
 		}
-		file[*steps - (position - 1)] = lines
+		file[*steps - position] = lines
 	}
 }
