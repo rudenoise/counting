@@ -70,8 +70,8 @@ func countAll(paths []string, position int) {
 }
 
 type Path struct {
-	name string
-	data []int
+	Name string
+	Data []int
 }
 
 func mapToSlice(cMap CountMap) []Path {
