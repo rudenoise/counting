@@ -29,7 +29,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(out, dirStr)
+		fmt.Println(out)
 		countAll(getPaths(dirStr))
 	}
 	// reset repo to master
@@ -50,6 +50,10 @@ func getPaths(dirStr string) []string {
 
 func countAll(paths []string) {
 	for i := 0; i < len(paths); i++ {
-		fmt.Println(count.LinesInFile(paths[i], true))
+		lines, err := count.LinesInFile(paths[i], true)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("%s %d", paths[i], lines)
 	}
 }
