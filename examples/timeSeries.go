@@ -1,6 +1,7 @@
 package main
 
 import(
+	"encoding/json"
 	"fmt"
 	"flag"
 	"path/filepath"
@@ -36,7 +37,11 @@ func main() {
 		panic(err)
 	}
 	countAll(getPaths(dirStr), *steps)
-	fmt.Println(mapToSlice(countMap))
+	o, err := json.Marshal(mapToSlice(countMap))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%s", o)
 }
 
 func getPaths(dirStr string) []string {
