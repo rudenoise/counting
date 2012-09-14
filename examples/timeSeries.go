@@ -25,7 +25,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s", out)
+		fmt.Println(out)
 	}
 	// reset repo to master
 	out, err := exec.Command("git", "checkout", "master").Output()
