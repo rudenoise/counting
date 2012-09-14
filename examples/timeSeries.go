@@ -34,7 +34,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("%s", out)
-	fmr.Println(countMap)
+	fmt.Println(countMap)
 }
 
 func getPaths(dirStr string) []string {
