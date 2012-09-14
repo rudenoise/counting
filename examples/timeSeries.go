@@ -35,6 +35,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("%s", out)
+	countAll(getPaths(dirStr), i)
 	fmt.Println(countMap)
 }
 
