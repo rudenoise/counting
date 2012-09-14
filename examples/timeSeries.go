@@ -9,8 +9,10 @@ import(
 	"os/exec"
 )
 
+type CountMap map[string] []int
+
 // map for collecting counts
-var countMap = map[string] []int {}
+var countMap = CountMap{}
 
 // flags
 var re = flag.String("regExp", ".*", "regexp pattern to match file paths")
@@ -58,4 +60,17 @@ func countAll(paths []string, position int) {
 		}
 		file[position] = lines
 	}
+}
+
+type Path struct {
+	name string
+	data []int
+}
+
+func mapToSlice(cMap CountMap) []Path {
+	paths := make([]Path, 0)
+	for k, v := range cMap {
+		paths = append(paths, Path{k, v})
+	}
+	return paths
 }
