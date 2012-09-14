@@ -22,19 +22,17 @@ func main() {
 	// loop over the previous x commits via git
 	for i := *steps; i > 0; i-- {
 		arg := fmt.Sprintf("master~%d", i)
-		out, err := exec.Command("git", "checkout", arg).Output()
+		err := exec.Command("git", "checkout", arg).Run()
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(out)
 		countAll(getPaths(dirStr), *steps - i)
 	}
 	// reset repo to master
-	out, err := exec.Command("git", "checkout", "master").Output()
+	err := exec.Command("git", "checkout", "master").Run()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s", out)
 	countAll(getPaths(dirStr), *steps)
 	fmt.Println(countMap)
 }
