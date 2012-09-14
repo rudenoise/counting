@@ -8,6 +8,7 @@ import(
 	"github.com/rudenoise/counting/dir"
 	"github.com/rudenoise/counting/count"
 	"os/exec"
+	"strings"
 )
 
 type CountMap map[string] []int
@@ -42,7 +43,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s", o)
+	jsonStr := fmt.Sprintf("%s", o)
+	jsonStr = strings.Replace(jsonStr, "Data", "data", -1)
+	jsonStr = strings.Replace(jsonStr, "Name", "name", -1)
+	fmt.Printf(jsonStr)
 }
 
 func getPaths(dirStr string) []string {
