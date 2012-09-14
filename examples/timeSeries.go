@@ -14,12 +14,13 @@ var countMap = map[string] []int {}
 
 // flags
 var re = flag.String("regExp", ".*", "regexp pattern to match file paths")
+var steps = flag.Int("steps", 5, "number of git history commits to look back into")
 
 func main() {
 	flag.Parse()
 	dirStr := filepath.Dir(flag.Arg(0))
-	// loop over the previous 5 commits via git
-	for i := 5; i > 0; i-- {
+	// loop over the previous x commits via git
+	for i := *steps - 1; i > 0; i-- {
 		arg := fmt.Sprintf("master~%d", i)
 		out, err := exec.Command("git", "checkout", arg).Output()
 		if err != nil {
@@ -53,9 +54,9 @@ func countAll(paths []string, position int) {
 		}
 		file, ok := countMap[paths[i]]
 		if ok == false {
-			countMap[paths[i]] = make([]int, 5)
+			countMap[paths[i]] = make([]int, *steps)
 			file = countMap[paths[i]]
 		}
-		file[4 - (position - 1)] = lines
+		file[*steps - (position - 1)] = lines
 	}
 }
