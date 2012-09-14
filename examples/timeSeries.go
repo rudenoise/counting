@@ -36,7 +36,7 @@ func main() {
 		panic(err)
 	}
 	countAll(getPaths(dirStr), *steps)
-	fmt.Println(countMap)
+	fmt.Println(mapToSlice(countMap))
 }
 
 func getPaths(dirStr string) []string {
