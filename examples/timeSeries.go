@@ -27,7 +27,7 @@ func main() {
 			panic(err)
 		}
 		fmt.Println(out)
-		countAll(getPaths(dirStr), i)
+		countAll(getPaths(dirStr), i - 1)
 	}
 	// reset repo to master
 	out, err := exec.Command("git", "checkout", "master").Output()
