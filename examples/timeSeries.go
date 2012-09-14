@@ -51,12 +51,11 @@ func countAll(paths []string, position int) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s %d", paths[i], lines)
 		file, ok := countMap[paths[i]]
 		if ok == false {
 			countMap[paths[i]] = make([]int, 5)
 			file = countMap[paths[i]]
 		}
-		file[position - 1] = lines
+		file[4 - (position - 1)] = lines
 	}
 }
