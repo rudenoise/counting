@@ -5,6 +5,7 @@ import(
 	"flag"
 	"path/filepath"
 	"github.com/rudenoise/counting/dir"
+	"github.com/rudenoise/counting/count"
 	"os/exec"
 )
 
@@ -24,13 +25,11 @@ func main() {
 	// loop over the previous 5 commits via git
 	for i := 5; i > 0; i-- {
 		arg := fmt.Sprintf("master~%d", i)
-		fmt.Println(arg)
 		out, err := exec.Command("git", "checkout", arg).Output()
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(out)
-		fmt.Println(getPaths(dirStr))
+		fmt.Println(count.LinesInFile(getPaths(dirStr), true))
 	}
 	// reset repo to master
 	out, err := exec.Command("git", "checkout", "master").Output()
