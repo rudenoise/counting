@@ -26,7 +26,7 @@ func main() {
 			panic(err)
 		}
 		fmt.Println(out)
-		countAll(getPaths(dirStr), i)
+		countAll(getPaths(dirStr))
 	}
 	// reset repo to master
 	out, err := exec.Command("git", "checkout", "master").Output()
@@ -44,18 +44,12 @@ func getPaths(dirStr string) []string {
 	return paths
 }
 
-func countAll(paths []string, position int) {
+func countAll(paths []string) {
 	for i := 0; i < len(paths); i++ {
 		lines, err := count.LinesInFile(paths[i], true)
 		if err != nil {
 			panic(err)
 		}
 		fmt.Printf("%s %d", paths[i], lines)
-		file, ok := countMap[paths[i]]
-		if ok == false {
-			countMap[paths[i]] = make([]int, 5)
-			file = countMap[paths[i]]
-		}
-		file[position] = lines
 	}
 }
