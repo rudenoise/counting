@@ -37,7 +37,7 @@ func main() {
 		panic(err)
 	}
 	countAll(getPaths(dirStr), *steps)
-	o, err := json.Marshal(mapToSlice(countMap))
+	o, err := json.MarshalIndent(mapToSlice(countMap), "\n", "  ")
 	if err != nil {
 		panic(err)
 	}
