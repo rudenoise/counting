@@ -20,6 +20,7 @@ func main() {
 	// loop over the previous 5 commits via git
 	for i := 5; i > 0; i-- {
 		arg := fmt.Sprintf("master~%d", i)
+		fmt.Println(arg)
 		out, err := exec.Command("git", "checkout", arg).Output()
 		if err != nil {
 			panic(err)
