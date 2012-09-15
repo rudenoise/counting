@@ -54,6 +54,18 @@ func main() {
 	fmt.Printf(jsonStr)
 }
 
+func printHTML(json string) string {
+	s := "<html><head>"
+	s += "<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js\"></script>"
+	s += "<script src=\"http://code.highcharts.com/highcharts.js\"></script>"
+	s += "<script src=\"http://code.highcharts.com/modules/exporting.js\"></script>"
+	s += "</head><body>"
+	s += json
+	s += "<div id=\"container\" style=\"min-width: 400px; height: 400px; margin: 0 auto\"></div>"
+	s += "</body></html>"
+	return s
+}
+
 func getPaths(dirStr string) []string {
 	paths, err := dir.AllPaths(dirStr, "^$", *re)
 	if err != nil {
