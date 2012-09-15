@@ -89,8 +89,8 @@ func (p Paths) Less(i, j int) bool {
 type PathsReverse struct { Paths }
 
 func (p PathsReverse) Less (i, j int) bool {
-	l := len(p[i].Data) - 1
-	return p[i].Data[l] > p[j].Data[l]
+	l := len(p.Paths[i].Data) - 1
+	return p.Paths[i].Data[l] > p.Paths[j].Data[l]
 }
 
 func mapToSlice(cMap CountMap) []Path {
