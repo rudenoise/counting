@@ -63,7 +63,7 @@ func printHTML(json string) string {
 	s += "<div id=\"container\" style=\"min-width: 400px; height: 400px; margin: 0 auto\"></div>"
 	s += "<script>$(function(){var chart;$(document).ready(function(){chart=new Highcharts.Chart({chart:{renderTo:'container',type:'line',marginRight:130,marginBottom:25},title:{text:'File Size (Lines)'},xAxis:{categories:[]},yAxis:{title:{text:'Lines'},plotLines:[{value:0,width:1,color:'#808080'}]},tooltip:{formatter:function(){return'<b>'+this.series.name+'</b><br/>'+this.y;}},legend:{layout:'vertical',align:'right',verticalAlign:'top',x:-10,y:100,borderWidth:0},series:"
 	s += json
-	s+="});});});"
+	s+="});});});</script>"
 	s += "</body></html>"
 	return s
 }
