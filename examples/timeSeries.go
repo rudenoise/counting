@@ -9,6 +9,7 @@ import(
 	"github.com/rudenoise/counting/count"
 	"os/exec"
 	"strings"
+	"sort"
 )
 
 type CountMap map[string] []int
@@ -77,10 +78,19 @@ type Path struct {
 	Data []int
 }
 
+type Paths []Path
+func (p Paths) Len() int           { return len(p) }
+func (p Paths) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p Paths) Less(i, j int) bool {
+	l := len(p[i].Data) - 1
+	return p[i].Data[l] < p[j].Data[l]
+}
+
 func mapToSlice(cMap CountMap) []Path {
-	paths := make([]Path, 0)
+	paths := make(Paths, 0)
 	for k, v := range cMap {
 		paths = append(paths, Path{k, v})
 	}
-	return paths
+	sort.Sort(paths)
+	return  paths
 }
