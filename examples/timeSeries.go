@@ -41,7 +41,10 @@ func main() {
 	}
 	countAll(getPaths(dirStr), *steps)
 	pathsSlice := mapToSlice(countMap)
-	o, err := json.Marshal(pathsSlice[0:*top])
+	if *top < len(pathsSlice) {
+		pathsSlice = pathsSlice[0:*top - 1]
+	}
+	o, err := json.Marshal(pathsSlice)
 	if err != nil {
 		panic(err)
 	}
