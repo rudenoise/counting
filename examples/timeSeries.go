@@ -86,11 +86,18 @@ func (p Paths) Less(i, j int) bool {
 	return p[i].Data[l] < p[j].Data[l]
 }
 
+type PathsReverse struct { Paths }
+
+func (p PathsReverse) Less (i, j int) bool {
+	l := len(p[i].Data) - 1
+	return p[i].Data[l] > p[j].Data[l]
+}
+
 func mapToSlice(cMap CountMap) []Path {
 	paths := make(Paths, 0)
 	for k, v := range cMap {
 		paths = append(paths, Path{k, v})
 	}
-	sort.Sort(paths)
+	sort.Sort(PathsReverse{ paths })
 	return  paths
 }
