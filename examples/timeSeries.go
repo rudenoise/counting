@@ -51,7 +51,7 @@ func main() {
 	jsonStr := fmt.Sprintf("%s", o)
 	jsonStr = strings.Replace(jsonStr, "Data", "data", -1)
 	jsonStr = strings.Replace(jsonStr, "Name", "name", -1)
-	fmt.Printf(jsonStr)
+	fmt.Printf(printHTML(jsonStr))
 }
 
 func printHTML(json string) string {
@@ -60,8 +60,10 @@ func printHTML(json string) string {
 	s += "<script src=\"http://code.highcharts.com/highcharts.js\"></script>"
 	s += "<script src=\"http://code.highcharts.com/modules/exporting.js\"></script>"
 	s += "</head><body>"
-	s += json
 	s += "<div id=\"container\" style=\"min-width: 400px; height: 400px; margin: 0 auto\"></div>"
+	s += "<script>$(function(){var chart;$(document).ready(function(){chart=new Highcharts.Chart({chart:{renderTo:'container',type:'line',marginRight:130,marginBottom:25},title:{text:'File Size (Lines)'},xAxis:{categories:[]},yAxis:{title:{text:'Lines'},plotLines:[{value:0,width:1,color:'#808080'}]},tooltip:{formatter:function(){return'<b>'+this.series.name+'</b><br/>'+this.y;}},legend:{layout:'vertical',align:'right',verticalAlign:'top',x:-10,y:100,borderWidth:0},series:"
+	s += json
+	s+="});});});"
 	s += "</body></html>"
 	return s
 }
