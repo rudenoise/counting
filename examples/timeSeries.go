@@ -20,13 +20,14 @@ var countMap = CountMap{}
 // flags
 var re = flag.String("regExp", ".*", "regexp pattern to match file paths")
 var steps = flag.Int("steps", 5, "number of git history commits to look back into")
+var interval = flag.Int("interval", 1, "intervals between steps")
 var top = flag.Int("top", 10, "top X largest files")
 
 func main() {
 	flag.Parse()
 	dirStr := filepath.Dir(flag.Arg(0))
 	// loop over the previous x commits via git
-	for i := *steps; i > 0; i-- {
+	for i := (*steps * *interval); i > 0; i -= *interval {
 		arg := fmt.Sprintf("master~%d", i)
 		err := exec.Command("git", "checkout", arg).Run()
 		if err != nil {
