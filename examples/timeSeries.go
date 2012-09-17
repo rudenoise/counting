@@ -27,20 +27,20 @@ func main() {
 	flag.Parse()
 	dirStr := filepath.Dir(flag.Arg(0))
 	// loop over the previous x commits via git
-	for i := (*steps * *interval); i >= *interval; i -= *interval {
+	for i := *steps; i > 0; i-- {
 		arg := fmt.Sprintf("master~%d", i)
 		err := exec.Command("git", "checkout", arg).Run()
 		if err != nil {
 			panic(err)
 		}
-		countAll(getPaths(dirStr), (*steps / *interval)-1)
+		countAll(getPaths(dirStr), *steps - i)
 	}
 	// reset repo to master
 	err := exec.Command("git", "checkout", "master").Run()
 	if err != nil {
 		panic(err)
 	}
-	countAll(getPaths(dirStr), (*steps / *interval))
+	countAll(getPaths(dirStr), *steps)
 	pathsSlice := mapToSlice(countMap)
 	if *top < len(pathsSlice) {
 		pathsSlice = pathsSlice[0:*top]
