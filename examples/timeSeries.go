@@ -27,7 +27,7 @@ func main() {
 	flag.Parse()
 	dirStr := filepath.Dir(flag.Arg(0))
 	// loop over the previous x commits via git
-	for i := (*steps * *interval); i > 0; i -= *interval {
+	for i := (*steps * *interval); i >= *interval; i -= *interval {
 		arg := fmt.Sprintf("master~%d", i)
 		err := exec.Command("git", "checkout", arg).Run()
 		if err != nil {
