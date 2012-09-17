@@ -33,14 +33,14 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		countAll(getPaths(dirStr), *steps-i)
+		countAll(getPaths(dirStr), (*steps / *interval)-i)
 	}
 	// reset repo to master
 	err := exec.Command("git", "checkout", "master").Run()
 	if err != nil {
 		panic(err)
 	}
-	countAll(getPaths(dirStr), *steps)
+	countAll(getPaths(dirStr), (*steps / *interval))
 	pathsSlice := mapToSlice(countMap)
 	if *top < len(pathsSlice) {
 		pathsSlice = pathsSlice[0:*top]
