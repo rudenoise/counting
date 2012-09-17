@@ -18,7 +18,8 @@ type CountMap map[string][]int
 var countMap = CountMap{}
 
 // flags
-var re = flag.String("regExp", ".*", "regexp pattern to match file paths")
+var exclude = flag.String("exclude", "^$", "regexp pattern to exclude in file path")
+var include = flag.String("include", "", "regexp pattern to include file path")
 var steps = flag.Int("steps", 5, "number of git history commits to look back into")
 var interval = flag.Int("interval", 1, "intervals between steps")
 var top = flag.Int("top", 10, "top X largest files")
@@ -70,7 +71,7 @@ func printHTML(json string) string {
 }
 
 func getPaths(dirStr string) []string {
-	paths, err := dir.AllPaths(dirStr, "^$", *re)
+	paths, err := dir.AllPaths(dirStr, *exclude, *include)
 	if err != nil {
 		panic(err)
 	}
