@@ -33,7 +33,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		countAll(getPaths(dirStr), (*steps / *interval)-i)
+		countAll(getPaths(dirStr), (*steps / *interval)-1)
 	}
 	// reset repo to master
 	err := exec.Command("git", "checkout", "master").Run()
