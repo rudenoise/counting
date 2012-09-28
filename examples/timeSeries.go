@@ -18,6 +18,7 @@ type CountMap map[string][]int
 var countMap = CountMap{}
 
 // flags
+var title = flag.String("title", "File Sizes (Lines)", "title for the generated report")
 var exclude = flag.String("exclude", "^$", "regexp pattern to exclude in file path")
 var include = flag.String("include", "", "regexp pattern to include file path")
 var steps = flag.Int("steps", 5, "number of git history commits to look back into")
@@ -34,7 +35,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		countAll(getPaths(dirStr), *steps - i)
+		countAll(getPaths(dirStr), *steps-i)
 	}
 	// reset repo to master
 	err := exec.Command("git", "checkout", "master").Run()
@@ -63,9 +64,11 @@ func printHTML(json string) string {
 	s += "<script src=\"http://code.highcharts.com/modules/exporting.js\"></script>"
 	s += "</head><body>"
 	s += "<div id=\"container\" style=\"min-width: 400px; height: 600px; margin: 0 auto\"></div>"
-	s += "<script>$(function(){var chart;$(document).ready(function(){chart=new Highcharts.Chart({chart:{renderTo:'container',type:'line',marginRight:230,marginBottom:25},title:{text:'File Size (Lines)'},xAxis:{categories:[]},yAxis:{title:{text:'Lines'},plotLines:[{value:0,width:1,color:'#808080'}]},tooltip:{formatter:function(){return'<b>'+this.series.name+'</b><br/>'+this.y;}},legend:{layout:'vertical',align:'right',verticalAlign:'top',x:-10,y:100,borderWidth:0},series:"
+	s += "<script>$(function(){var chart;$(document).ready(function(){chart=new Highcharts.Chart({chart:{renderTo:'container',type:'line',marginRight:230,marginBottom:25},title:{text:'"
+	s += *title
+	s += "'},xAxis:{categories:[]},yAxis:{title:{text:'Lines'},plotLines:[{value:0,width:1,color:'#808080'}]},tooltip:{formatter:function(){return'<b>'+this.series.name+'</b><br/>'+this.y;}},legend:{layout:'vertical',align:'right',verticalAlign:'top',x:-10,y:100,borderWidth:0},series:"
 	s += json
-	s+="});});});</script>"
+	s += "});});});</script>"
 	s += "</body></html>"
 	return s
 }
