@@ -56,6 +56,7 @@ func main() {
 	flag.Parse()
 	dirStr := filepath.Dir(flag.Arg(0))
 	pths, err := dir.AllPaths(dirStr, *exclude, *include)
+	total := 0
 	if err != nil {
 		panic(err)
 	}
@@ -69,8 +70,10 @@ func main() {
 			length = *lmt
 		}
 		for i := 0; i < length; i++ {
+			total += files[i].LineCount
 			fmt.Printf("%7d\t%s\n", files[i].LineCount, files[i].FilePath)
 		}
+		fmt.Printf("\n%7d\ttotal\n\n", total)
 	} else {
 		fmt.Printf("\nDidn't bother, you tried to meaure %d files, limit set to %d\n\n", len(pths), limit)
 	}
