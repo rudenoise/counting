@@ -47,13 +47,19 @@ var include = flag.String("include", "", "regexp pattern to include file path")
 
 func out(p Files, limit int) {
 	// print headings
-	fmt.Printf("%7s\t%7s\t%s\n", "Lines", "Bytes", "Path")
+	fmt.Printf("\n%7s\t%7s\t%s\n", "Lines", "Bytes", "Path")
+	lineTotal := 0
+	var byteTotal int64
+	byteTotal = 0
 	for i := 0; i < limit; i++ {
 		// print out all collected file info
 		if p[i].FilePath != "." {
+			lineTotal += p[i].Lines
+			byteTotal += p[i].ByteLen
 			fmt.Printf("%7d\t%7d\t%s\n", p[i].Lines, p[i].ByteLen, p[i].FilePath)
 		}
 	}
+	fmt.Printf("\n%7d\t%7d\t%s\n\n", lineTotal, byteTotal, "Total")
 }
 
 func fullInfo(fps []string, elc bool) Files {
