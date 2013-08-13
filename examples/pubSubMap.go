@@ -7,18 +7,17 @@ import (
 	"github.com/rudenoise/counting/dir"
 	"path/filepath"
 	"regexp"
-	//"runtime"
-	//"sort"
 )
 
 type File struct {
-	publish []string
+	publish  []string
 	subcribe []string
 }
 
 // set up flag defraults
 var exclude = flag.String("e", "^$", "regexp pattern to exclude in file path")
 var include = flag.String("i", "", "regexp pattern to include file path")
+
 // set up pubSub RegExps
 var pubRE = "m\\.publish\\([\\'\"]([\\w\\.]|\\w)+"
 var subRE = "m\\.subscribe\\([\\'\"]([\\w\\.]|\\w)+"
@@ -56,14 +55,18 @@ func main() {
 		count.TokensInFile(filePaths[i], subRE, subMap)
 		if len(pubMap) > 0 || len(subMap) > 0 {
 			file := new(File)
+			// loop all publishes
 			for token := range pubMap {
 				token = compiledTokenRE.FindString(token)
 				file.publish = append(file.publish, token)
+				// add to deduped list
 				allTokens[token] = 1
 			}
+			// loop all subscribes
 			for token := range subMap {
 				token = compiledTokenRE.FindString(token)
 				file.subcribe = append(file.subcribe, token)
+				// add to deduped list
 				allTokens[token] = 1
 			}
 			files[filePaths[i]] = File{file.publish, file.subcribe}
@@ -71,7 +74,6 @@ func main() {
 	}
 	// now we have a map of all files and their publshed and subscribed keys
 	fmt.Println("digraph PubSub{")
-	//fmt.Println(files)
 	// create dot file output
 	// all token nodes
 	for tkn := range allTokens {
@@ -92,4 +94,3 @@ func main() {
 	}
 	fmt.Println("}")
 }
-
