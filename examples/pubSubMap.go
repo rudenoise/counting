@@ -12,6 +12,8 @@ import (
 type File struct {
 	publish  []string
 	subcribe []string
+	stateSet []string
+	stateGet []string
 }
 
 // set up flag defraults
@@ -21,8 +23,9 @@ var include = flag.String("i", "", "regexp pattern to include file path")
 // set up pubSub RegExps
 var pubRE = "m\\.publish\\([\\'\"]([\\w\\.]|\\w)+"
 var subRE = "m\\.subscribe\\([\\'\"]([\\w\\.]|\\w)+"
+var stateSetRE = "m\\.state\\.set\\([\\'\"]([\\w\\.]|\\w)+"
+var stateGetRE = "m\\.(state\\.get|state)\\([\\'\"]([\\w\\.]|\\w)+"
 var tokenRE = "([\\w\\.]|\\w)+$"
-var fileNameRE = "[\\w\\.]+$"
 
 func main() {
 	// parse cmd flags
@@ -36,10 +39,6 @@ func main() {
 	}
 	// create the regexp to isolate the key
 	compiledTokenRE, err := regexp.Compile(tokenRE)
-	compiledFileNameRE, err := regexp.Compile(fileNameRE)
-	if err != nil {
-		panic(err)
-	}
 	// create a difinitive map of tokens
 	allTokens := make(map[string]int)
 	// create a map for files
@@ -47,49 +46,83 @@ func main() {
 	// loop all files paths
 	length := len(filePaths)
 	for i := 0; i < length; i++ {
-		// collect published tokens in file
+		// collect published tokens from file
 		pubMap := make(count.TokensMap)
 		count.TokensInFile(filePaths[i], pubRE, pubMap)
-		// collect subscribed tokens in file
+		// collect subscribed tokens from file
 		subMap := make(count.TokensMap)
 		count.TokensInFile(filePaths[i], subRE, subMap)
-		if len(pubMap) > 0 || len(subMap) > 0 {
+		// collect state.set tokens from file
+		stateSetMap := make(count.TokensMap)
+		count.TokensInFile(filePaths[i], stateSetRE, stateSetMap)
+		// collect state.get tokens from file
+		stateGetMap := make(count.TokensMap)
+		count.TokensInFile(filePaths[i], stateGetRE, stateGetMap)
+		// make sure there is data to collect
+		if len(pubMap) > 0 || len(subMap) > 0 || len(stateSetMap) > 0 || len(stateGetMap) > 0 {
 			file := new(File)
 			// loop all publishes
 			for token := range pubMap {
 				token = compiledTokenRE.FindString(token)
 				file.publish = append(file.publish, token)
 				// add to deduped list
-				allTokens[token] = 1
+				allTokens[token] = 0
 			}
 			// loop all subscribes
 			for token := range subMap {
 				token = compiledTokenRE.FindString(token)
 				file.subcribe = append(file.subcribe, token)
 				// add to deduped list
+				allTokens[token] = 0
+			}
+			// loop all state set tokens
+			for token := range stateSetMap {
+				token = compiledTokenRE.FindString(token)
+				file.stateSet = append(file.stateSet, token)
+				// add to deduped list
 				allTokens[token] = 1
 			}
-			files[filePaths[i]] = File{file.publish, file.subcribe}
+			// loop all state get tokens
+			for token := range stateGetMap {
+				token = compiledTokenRE.FindString(token)
+				file.stateGet = append(file.stateGet, token)
+				// add to deduped list
+				allTokens[token] = 1
+			}
+			files[filePaths[i]] = File{file.publish, file.subcribe, file.stateSet, file.stateGet}
 		}
 	}
 	// now we have a map of all files and their publshed and subscribed keys
 	fmt.Println("digraph PubSub{")
 	// create dot file output
 	// all token nodes
-	for tkn := range allTokens {
-		fmt.Printf("\t\"%s\" [shape=circle]", tkn)
+	for tkn, val := range allTokens {
+		style := ""
+		if val == 1 {
+			style = "[shape=circle, style=filled, color=grey]"
+		} else {
+			style = "[shape=circle]"
+		}
+		fmt.Printf("\t\"%s\" %s", tkn, style)
 	}
 	// all file nodes:
 	for fn, rel := range files {
-		baseFn := compiledFileNameRE.FindString(fn)
-		fmt.Printf("\t\"%s\" [shape=box];\n", baseFn)
+		fmt.Printf("\t\"%s\" [shape=box];\n", fn)
 		// all publish relationships
 		for i := 0; i < len(rel.publish); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=blue];", baseFn, rel.publish[i])
+			fmt.Printf("\t\"%s\"->\"%s\" [color=blue];", fn, rel.publish[i])
 		}
 		// all subscribe relationships
 		for i := 0; i < len(rel.subcribe); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=orange];", rel.subcribe[i], baseFn)
+			fmt.Printf("\t\"%s\"->\"%s\" [color=orange];", rel.subcribe[i], fn)
+		}
+		// all stateSet relationships
+		for i := 0; i < len(rel.stateSet); i++ {
+			fmt.Printf("\t\"%s\"->\"%s\" [color=black];", fn, rel.stateSet[i])
+		}
+		// all stateGet relationships
+		for i := 0; i < len(rel.stateGet); i++ {
+			fmt.Printf("\t\"%s\"->\"%s\" [color=grey];", rel.stateGet[i], fn)
 		}
 	}
 	fmt.Println("}")
