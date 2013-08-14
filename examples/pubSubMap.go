@@ -93,36 +93,36 @@ func main() {
 		}
 	}
 	// now we have a map of all files and their publshed and subscribed keys
-	fmt.Println("digraph PubSub{")
+	fmt.Printf("digraph PubSub{\n")
 	// create dot file output
 	// all token nodes
 	for tkn, val := range allTokens {
 		style := ""
 		if val == 1 {
-			style = "[shape=circle, style=filled, color=grey]"
-		} else {
-			style = "[shape=circle]"
-		}
-		fmt.Printf("\t\"%s\" %s", tkn, style)
+			style = "[style=filled, color=grey]"
+		}/* else {
+			//style = "[shape=circle]"
+		}*/
+		fmt.Printf("\t\"%s\" %s\n", tkn, style)
 	}
 	// all file nodes:
 	for fn, rel := range files {
 		fmt.Printf("\t\"%s\" [shape=box];\n", fn)
 		// all publish relationships
 		for i := 0; i < len(rel.publish); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=blue];", fn, rel.publish[i])
+			fmt.Printf("\t\"%s\"->\"%s\" [color=blue];\n", fn, rel.publish[i])
 		}
 		// all subscribe relationships
 		for i := 0; i < len(rel.subcribe); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=orange];", rel.subcribe[i], fn)
+			fmt.Printf("\t\"%s\"->\"%s\" [color=orange];\n", rel.subcribe[i], fn)
 		}
 		// all stateSet relationships
 		for i := 0; i < len(rel.stateSet); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=black];", fn, rel.stateSet[i])
+			fmt.Printf("\t\"%s\"->\"%s\" [color=black];\n", fn, rel.stateSet[i])
 		}
 		// all stateGet relationships
 		for i := 0; i < len(rel.stateGet); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=grey];", rel.stateGet[i], fn)
+			fmt.Printf("\t\"%s\"->\"%s\" [color=grey];\n", rel.stateGet[i], fn)
 		}
 	}
 	fmt.Println("}")
