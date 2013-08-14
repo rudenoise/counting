@@ -19,6 +19,8 @@ type File struct {
 // set up flag defraults
 var exclude = flag.String("e", "^$", "regexp pattern to exclude in file path")
 var include = flag.String("i", "", "regexp pattern to include file path")
+var fileShape = flag.String("f", "box", "a graphviz/dot shape for files")
+var channelShape = flag.String("c", "oval", "a graphviz/dot shape for pubSub/state channels")
 
 // set up pubSub RegExps
 var pubRE = "m\\.publish\\([\\'\"]([\\w\\.]|\\w)+"
@@ -97,17 +99,15 @@ func main() {
 	// create dot file output
 	// all token nodes
 	for tkn, val := range allTokens {
-		style := ""
 		if val == 1 {
-			style = "[style=filled, color=grey]"
-		}/* else {
-			//style = "[shape=circle]"
-		}*/
-		fmt.Printf("\t\"%s\" %s\n", tkn, style)
+			fmt.Printf("\t\"%s\" [shape=%s, style=filled, color=grey]\n", tkn, *channelShape)
+		} else {
+			fmt.Printf("\t\"%s\" [shape=%s]\n", tkn, *channelShape)
+		}
 	}
 	// all file nodes:
 	for fn, rel := range files {
-		fmt.Printf("\t\"%s\" [shape=box];\n", fn)
+		fmt.Printf("\t\"%s\" [shape=%s];\n", fn, *fileShape)
 		// all publish relationships
 		for i := 0; i < len(rel.publish); i++ {
 			fmt.Printf("\t\"%s\"->\"%s\" [color=blue];\n", fn, rel.publish[i])
