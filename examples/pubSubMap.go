@@ -64,43 +64,31 @@ func main() {
 		count.TokensInFile(filePaths[i], stateGetRE, stateGetMap)
 		// make sure there is data to collect
 		if len(pubMap) > 0 || len(subMap) > 0 || len(stateSetMap) > 0 || len(stateGetMap) > 0 {
-			// loop all publishes
-			publish := []string{}
-			for token := range pubMap {
-				token = compiledTokenRE.FindString(token)
-				publish = append(publish, token)
-				// add to deduped list
-				allTokens[token] = 0
+			// collect all state and pubSub interactions for this file
+			files[filePaths[i]] = File{
+				loopTokens(pubMap, compiledTokenRE, allTokens, 0),
+				loopTokens(subMap, compiledTokenRE, allTokens, 0),
+				loopTokens(stateSetMap, compiledTokenRE, allTokens, 1),
+				loopTokens(stateGetMap, compiledTokenRE, allTokens, 1),
 			}
-			// loop all subscribes
-			subcribe := []string{}
-			for token := range subMap {
-				token = compiledTokenRE.FindString(token)
-				subcribe = append(subcribe, token)
-				// add to deduped list
-				allTokens[token] = 0
-			}
-			// loop all state set tokens
-			stateSet := []string{}
-			for token := range stateSetMap {
-				token = compiledTokenRE.FindString(token)
-				stateSet = append(stateSet, token)
-				// add to deduped list
-				allTokens[token] = 1
-			}
-			// loop all state get tokens
-			//stateGet, allTokens := loopTokens(stateGetMap, compiledTokenRE, allTokens, 1)
-			stateGet := []string{}
-			for token := range stateGetMap {
-				token = compiledTokenRE.FindString(token)
-				stateGet = append(stateGet, token)
-				// add to deduped list
-				allTokens[token] = 1
-			}
-			files[filePaths[i]] = File{publish, subcribe, stateSet, stateGet}
 		}
 	}
 	// now we have a map of all files and their publshed and subscribed keys
+	printInDotFormat(allTokens, files)
+}
+
+func loopTokens(spMap count.TokensMap, compiledTokenRE *regexp.Regexp, allTokens map[string]int, tokenType int) []string {
+	tokens := []string{}
+	for token := range spMap {
+		token = compiledTokenRE.FindString(token)
+		tokens = append(tokens, token)
+		// add to deduped list
+		allTokens[token] = tokenType
+	}
+	return tokens
+}
+
+func printInDotFormat(allTokens allT, files map[string]File) {
 	fmt.Printf("digraph PubSub{\n")
 	// create dot file output
 	// all token nodes
@@ -132,15 +120,4 @@ func main() {
 		}
 	}
 	fmt.Println("}")
-}
-
-func loopTokens(spMap count.TokensMap, compiledTokenRE *regexp.Regexp, allTokens map[string]int, tokenType int) ([]string, map[string]int) {
-	tokens := []string{}
-	for token := range spMap {
-		token = compiledTokenRE.FindString(token)
-		tokens = append(tokens, token)
-		// add to deduped list
-		allTokens[token] = tokenType
-	}
-	return tokens, allTokens
 }
