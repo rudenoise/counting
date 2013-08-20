@@ -16,7 +16,7 @@ type File struct {
 	stateGet []string
 }
 
-type allT map[string]int
+type AllTokens map[string]int
 
 // set up flag defraults
 var exclude = flag.String("e", "^$", "regexp pattern to exclude in file path")
@@ -44,7 +44,7 @@ func main() {
 	// create the regexp to isolate the key
 	compiledTokenRE, err := regexp.Compile(tokenRE)
 	// create a difinitive map of tokens
-	allTokens := make(allT)
+	allTokens := make(AllTokens)
 	// create a map for files
 	files := make(map[string]File)
 	// loop all files paths
@@ -77,7 +77,7 @@ func main() {
 	printInDotFormat(allTokens, files)
 }
 
-func loopTokens(spMap count.TokensMap, compiledTokenRE *regexp.Regexp, allTokens map[string]int, tokenType int) []string {
+func loopTokens(spMap count.TokensMap, compiledTokenRE *regexp.Regexp, allTokens AllTokens, tokenType int) []string {
 	tokens := []string{}
 	for token := range spMap {
 		token = compiledTokenRE.FindString(token)
@@ -88,7 +88,7 @@ func loopTokens(spMap count.TokensMap, compiledTokenRE *regexp.Regexp, allTokens
 	return tokens
 }
 
-func printInDotFormat(allTokens allT, files map[string]File) {
+func printInDotFormat(allTokens AllTokens, files map[string]File) {
 	fmt.Printf("digraph PubSub{\n")
 	// create dot file output
 	// all token nodes
