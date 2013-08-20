@@ -16,6 +16,8 @@ type File struct {
 	stateGet []string
 }
 
+type allT map[string]int
+
 // set up flag defraults
 var exclude = flag.String("e", "^$", "regexp pattern to exclude in file path")
 var include = flag.String("i", "", "regexp pattern to include file path")
@@ -42,7 +44,7 @@ func main() {
 	// create the regexp to isolate the key
 	compiledTokenRE, err := regexp.Compile(tokenRE)
 	// create a difinitive map of tokens
-	allTokens := make(map[string]int)
+	allTokens := make(allT)
 	// create a map for files
 	files := make(map[string]File)
 	// loop all files paths
@@ -62,36 +64,40 @@ func main() {
 		count.TokensInFile(filePaths[i], stateGetRE, stateGetMap)
 		// make sure there is data to collect
 		if len(pubMap) > 0 || len(subMap) > 0 || len(stateSetMap) > 0 || len(stateGetMap) > 0 {
-			file := new(File)
 			// loop all publishes
+			publish := []string{}
 			for token := range pubMap {
 				token = compiledTokenRE.FindString(token)
-				file.publish = append(file.publish, token)
+				publish = append(publish, token)
 				// add to deduped list
 				allTokens[token] = 0
 			}
 			// loop all subscribes
+			subcribe := []string{}
 			for token := range subMap {
 				token = compiledTokenRE.FindString(token)
-				file.subcribe = append(file.subcribe, token)
+				subcribe = append(subcribe, token)
 				// add to deduped list
 				allTokens[token] = 0
 			}
 			// loop all state set tokens
+			stateSet := []string{}
 			for token := range stateSetMap {
 				token = compiledTokenRE.FindString(token)
-				file.stateSet = append(file.stateSet, token)
+				stateSet = append(stateSet, token)
 				// add to deduped list
 				allTokens[token] = 1
 			}
 			// loop all state get tokens
+			//stateGet, allTokens := loopTokens(stateGetMap, compiledTokenRE, allTokens, 1)
+			stateGet := []string{}
 			for token := range stateGetMap {
 				token = compiledTokenRE.FindString(token)
-				file.stateGet = append(file.stateGet, token)
+				stateGet = append(stateGet, token)
 				// add to deduped list
 				allTokens[token] = 1
 			}
-			files[filePaths[i]] = File{file.publish, file.subcribe, file.stateSet, file.stateGet}
+			files[filePaths[i]] = File{publish, subcribe, stateSet, stateGet}
 		}
 	}
 	// now we have a map of all files and their publshed and subscribed keys
@@ -126,4 +132,15 @@ func main() {
 		}
 	}
 	fmt.Println("}")
+}
+
+func loopTokens(spMap count.TokensMap, compiledTokenRE *regexp.Regexp, allTokens map[string]int, tokenType int) ([]string, map[string]int) {
+	tokens := []string{}
+	for token := range spMap {
+		token = compiledTokenRE.FindString(token)
+		tokens = append(tokens, token)
+		// add to deduped list
+		allTokens[token] = tokenType
+	}
+	return tokens, allTokens
 }
