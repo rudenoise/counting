@@ -77,7 +77,11 @@ func main() {
 	printInDotFormat(allTokens, files)
 }
 
-func loopTokens(spMap count.TokensMap, compiledTokenRE *regexp.Regexp, allTokens AllTokens, tokenType int) []string {
+func loopTokens(
+	spMap count.TokensMap,
+	compiledTokenRE *regexp.Regexp,
+	allTokens AllTokens, tokenType int,
+) []string {
 	tokens := []string{}
 	for token := range spMap {
 		token = compiledTokenRE.FindString(token)

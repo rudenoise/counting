@@ -2,10 +2,8 @@ package count
 
 type TokensMap map[string]int
 
-func (tokensMap *TokensMap) Add(token string) {
-	tm := *tokensMap
-	tm[token] = tm[token] + 1
-	*tokensMap = tm
+func (tokensMap TokensMap) Add(token string) {
+	tokensMap[token] += 1
 }
 
 func (tokensMap TokensMap) ToSlice() TokenSlice {
