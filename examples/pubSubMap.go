@@ -7,6 +7,7 @@ import (
 	"github.com/rudenoise/counting/dir"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 type File struct {
@@ -23,6 +24,7 @@ var exclude = flag.String("e", "^$", "regexp pattern to exclude in file path")
 var include = flag.String("i", "", "regexp pattern to include file path")
 var fileShape = flag.String("f", "box", "a graphviz/dot shape for files")
 var channelShape = flag.String("c", "oval", "a graphviz/dot shape for pubSub/state channels")
+var channelFilter = flag.String("cf", "", "comma separated list of channels to include")
 
 // set up pubSub RegExps
 var pubRE = "m\\.publish\\([\\'\"]([\\w\\.]|\\w)+"
@@ -93,14 +95,28 @@ func loopTokens(
 }
 
 func printInDotFormat(allTokens AllTokens, files map[string]File) {
+	// get channels to filter
+	channelFilterSlice := strings.Split(*channelFilter, ",")
+	// number of channels
+	numFilterChans := 0
+	if *channelFilter != "" {
+		numFilterChans = len(channelFilterSlice)
+	}
+	chanFilterMap := make(map[string]bool)
+	for _, v := range channelFilterSlice {
+		chanFilterMap[v] = true
+	}
+	// start printing
 	fmt.Printf("digraph PubSub{\n")
 	// create dot file output
 	// all token nodes
 	for tkn, val := range allTokens {
-		if val == 1 {
-			fmt.Printf("\t\"%s\" [shape=%s, style=filled, color=grey]\n", tkn, *channelShape)
-		} else {
-			fmt.Printf("\t\"%s\" [shape=%s]\n", tkn, *channelShape)
+		if chanFilterMap[tkn] == true || numFilterChans == 0 {
+			if val == 1 {
+				fmt.Printf("\t\"%s\" [shape=%s, style=filled, color=grey]\n", tkn, *channelShape)
+			} else {
+				fmt.Printf("\t\"%s\" [shape=%s]\n", tkn, *channelShape)
+			}
 		}
 	}
 	// all file nodes:
@@ -108,19 +124,27 @@ func printInDotFormat(allTokens AllTokens, files map[string]File) {
 		fmt.Printf("\t\"%s\" [shape=%s];\n", fn, *fileShape)
 		// all publish relationships
 		for i := 0; i < len(rel.publish); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=blue];\n", fn, rel.publish[i])
+			if chanFilterMap[rel.publish[i]] == true || numFilterChans == 0 {
+				fmt.Printf("\t\"%s\"->\"%s\" [color=blue];\n", fn, rel.publish[i])
+			}
 		}
 		// all subscribe relationships
 		for i := 0; i < len(rel.subcribe); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=orange];\n", rel.subcribe[i], fn)
+			if chanFilterMap[rel.subcribe[i]] == true || numFilterChans == 0 {
+				fmt.Printf("\t\"%s\"->\"%s\" [color=orange];\n", rel.subcribe[i], fn)
+			}
 		}
 		// all stateSet relationships
 		for i := 0; i < len(rel.stateSet); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=black];\n", fn, rel.stateSet[i])
+			if chanFilterMap[rel.stateSet[i]] == true || numFilterChans == 0 {
+				fmt.Printf("\t\"%s\"->\"%s\" [color=black];\n", fn, rel.stateSet[i])
+			}
 		}
 		// all stateGet relationships
 		for i := 0; i < len(rel.stateGet); i++ {
-			fmt.Printf("\t\"%s\"->\"%s\" [color=grey];\n", rel.stateGet[i], fn)
+			if chanFilterMap[rel.stateGet[i]] == true || numFilterChans == 0 {
+				fmt.Printf("\t\"%s\"->\"%s\" [color=grey];\n", rel.stateGet[i], fn)
+			}
 		}
 	}
 	fmt.Println("}")
