@@ -64,19 +64,19 @@ func main() {
 		// collect state.get tokens from file
 		stateGetMap := make(count.TokensMap)
 		count.TokensInFile(filePaths[i], stateGetRE, stateGetMap)
-		// make sure there is data to collect
-		if len(pubMap) > 0 || len(subMap) > 0 || len(stateSetMap) > 0 || len(stateGetMap) > 0 {
-			// collect all state and pubSub interactions for this file
-			files[filePaths[i]] = File{
-				loopTokens(pubMap, compiledTokenRE, allTokens, 0),
-				loopTokens(subMap, compiledTokenRE, allTokens, 0),
-				loopTokens(stateSetMap, compiledTokenRE, allTokens, 1),
-				loopTokens(stateGetMap, compiledTokenRE, allTokens, 1),
-			}
+		// collect all state and pubSub interactions for this file
+		files[filePaths[i]] = File{
+			loopTokens(pubMap, compiledTokenRE, allTokens, 0),
+			loopTokens(subMap, compiledTokenRE, allTokens, 0),
+			loopTokens(stateSetMap, compiledTokenRE, allTokens, 1),
+			loopTokens(stateGetMap, compiledTokenRE, allTokens, 1),
 		}
 	}
 	// now we have a map of all files and their publshed and subscribed keys
-	printInDotFormat(allTokens, files)
+	printInDotFormat(
+		allTokens,
+		filterEmptyFiles(files),
+	)
 }
 
 func loopTokens(
@@ -85,38 +85,88 @@ func loopTokens(
 	allTokens AllTokens, tokenType int,
 ) []string {
 	tokens := []string{}
+	filter, total := chopUpChannelFilterFlag()
 	for token := range spMap {
 		token = compiledTokenRE.FindString(token)
-		tokens = append(tokens, token)
-		// add to deduped list
-		allTokens[token] = tokenType
+		if total == 0 {
+			tokens = append(tokens, token)
+			// add to deduped list
+			allTokens[token] = tokenType
+		} else {
+			if filter[token] == true {
+				tokens = append(tokens, token)
+				// add to deduped list
+				allTokens[token] = tokenType
+			}
+		}
 	}
 	return tokens
 }
 
-func printInDotFormat(allTokens AllTokens, files map[string]File) {
+func chopUpChannelFilterFlag () (map[string]bool, int) {
 	// get channels to filter
-	channelFilterSlice := strings.Split(*channelFilter, ",")
-	// number of channels
-	numFilterChans := 0
-	if *channelFilter != "" {
-		numFilterChans = len(channelFilterSlice)
-	}
 	chanFilterMap := make(map[string]bool)
-	for _, v := range channelFilterSlice {
-		chanFilterMap[v] = true
+	if *channelFilter != "" {
+		channelFilterSlice := strings.Split(*channelFilter, ",")
+		total := 0
+		for _, v := range channelFilterSlice {
+			chanFilterMap[v] = true
+			total ++
+		}
+		return chanFilterMap, total
+	} else {
+		return chanFilterMap, 0
 	}
+}
+
+func filterAllTokens(allTokens AllTokens, filter map[string]bool) AllTokens {
+	filtered := make(AllTokens)
+	for token, val := range allTokens {
+		if filter[token] == true {
+			filtered[token] = val
+		}
+	}
+	return filtered
+}
+
+func filterTokens(
+	tokens []string,
+	filter map[string]bool,
+) []string {
+	filtered := []string{}
+	for _, token := range tokens {
+		if filter[token] == true {
+			filtered = append(filtered, token)
+		}
+	}
+	return filtered
+}
+
+func filterEmptyFiles(
+	files map[string]File,
+) map[string]File {
+	filtered := make(map[string]File)
+	for name, file := range files {
+		if (len(file.publish) > 0 || len(file.subcribe) > 0 || len(file.stateSet) > 0 || len(file.stateGet) > 0) {
+			filtered[name] = file
+		}
+	}
+	return filtered
+}
+
+func printInDotFormat(
+	allTokens AllTokens,
+	files map[string]File,
+) {
 	// start printing
 	fmt.Printf("digraph PubSub{\n")
 	// create dot file output
 	// all token nodes
 	for tkn, val := range allTokens {
-		if chanFilterMap[tkn] == true || numFilterChans == 0 {
-			if val == 1 {
-				fmt.Printf("\t\"%s\" [shape=%s, style=filled, color=grey]\n", tkn, *channelShape)
-			} else {
-				fmt.Printf("\t\"%s\" [shape=%s]\n", tkn, *channelShape)
-			}
+		if val == 1 {
+			fmt.Printf("\t\"%s\" [shape=%s, style=filled, color=grey]\n", tkn, *channelShape)
+		} else {
+			fmt.Printf("\t\"%s\" [shape=%s]\n", tkn, *channelShape)
 		}
 	}
 	// all file nodes:
@@ -124,28 +174,21 @@ func printInDotFormat(allTokens AllTokens, files map[string]File) {
 		fmt.Printf("\t\"%s\" [shape=%s];\n", fn, *fileShape)
 		// all publish relationships
 		for i := 0; i < len(rel.publish); i++ {
-			if chanFilterMap[rel.publish[i]] == true || numFilterChans == 0 {
-				fmt.Printf("\t\"%s\"->\"%s\" [color=blue];\n", fn, rel.publish[i])
-			}
+			fmt.Printf("\t\"%s\"->\"%s\" [color=blue];\n", fn, rel.publish[i])
 		}
 		// all subscribe relationships
 		for i := 0; i < len(rel.subcribe); i++ {
-			if chanFilterMap[rel.subcribe[i]] == true || numFilterChans == 0 {
-				fmt.Printf("\t\"%s\"->\"%s\" [color=orange];\n", rel.subcribe[i], fn)
-			}
+			fmt.Printf("\t\"%s\"->\"%s\" [color=orange];\n", rel.subcribe[i], fn)
 		}
 		// all stateSet relationships
 		for i := 0; i < len(rel.stateSet); i++ {
-			if chanFilterMap[rel.stateSet[i]] == true || numFilterChans == 0 {
-				fmt.Printf("\t\"%s\"->\"%s\" [color=black];\n", fn, rel.stateSet[i])
-			}
+			fmt.Printf("\t\"%s\"->\"%s\" [color=black];\n", fn, rel.stateSet[i])
 		}
 		// all stateGet relationships
 		for i := 0; i < len(rel.stateGet); i++ {
-			if chanFilterMap[rel.stateGet[i]] == true || numFilterChans == 0 {
-				fmt.Printf("\t\"%s\"->\"%s\" [color=grey];\n", rel.stateGet[i], fn)
-			}
+			fmt.Printf("\t\"%s\"->\"%s\" [color=grey];\n", rel.stateGet[i], fn)
 		}
 	}
 	fmt.Println("}")
 }
+
